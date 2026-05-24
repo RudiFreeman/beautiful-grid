@@ -1,6 +1,6 @@
 /** Верхняя навигация: Library / Grid / Export, управление проектом, кнопка Support. */
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { newProject, openProject, saveProject } from "../lib/tauri-commands";
@@ -15,6 +15,8 @@ const NAV_ITEMS = [
 
 export function NavBar() {
   const [showSupport, setShowSupport] = useState(false);
+  const [saveLabel, setSaveLabel] = useState("Save");
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const store = useAppStore();
 
   const handleNew = async () => {
@@ -33,17 +35,25 @@ export function NavBar() {
     });
     if (!path) return;
 
-    await saveProject(
-      {
-        projectName: store.projectName,
-        version: 1,
-        createdAt: new Date().toISOString(),
-        settings: store.settings,
-        photos: store.photos,
-        gridOrder: store.gridOrder,
-      },
-      path,
-    ).catch(console.error);
+    try {
+      await saveProject(
+        {
+          projectName: store.projectName,
+          version: 1,
+          createdAt: new Date().toISOString(),
+          settings: store.settings,
+          photos: store.photos,
+          gridOrder: store.gridOrder,
+        },
+        path,
+      );
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      setSaveLabel("Saved ✓");
+      saveTimerRef.current = setTimeout(() => setSaveLabel("Save"), 2000);
+    } catch (e) {
+      console.error("Save failed:", e);
+      setSaveLabel("Save");
+    }
   };
 
   const handleOpen = async () => {
@@ -95,7 +105,6 @@ export function NavBar() {
         {[
           { label: "New", action: handleNew },
           { label: "Open", action: handleOpen },
-          { label: "Save", action: handleSave },
         ].map(({ label, action }) => (
           <button
             key={label}
@@ -105,6 +114,12 @@ export function NavBar() {
             {label}
           </button>
         ))}
+        <button
+          onClick={handleSave}
+          className="rounded px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-300"
+        >
+          {saveLabel}
+        </button>
 
         {/* Кнопка Support */}
         <button

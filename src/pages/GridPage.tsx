@@ -284,7 +284,7 @@ function GridCell({
   cellPx: number;
   isDragging?: boolean;
 }) {
-  const src = photo.thumbPath ? convertFileSrc(photo.thumbPath) : null;
+  const src = convertFileSrc(photo.thumbPath ?? photo.path);
   const cellH = Math.round(cellPx * 0.75); // 4:3
 
   return (
@@ -295,21 +295,15 @@ function GridCell({
       ].join(" ")}
       style={{ width: cellPx, height: cellH, flexShrink: 0 }}
     >
-      {src ? (
-        <img
-          src={src}
-          width={cellPx}
-          height={cellH}
-          className="h-full w-full object-cover pointer-events-none"
-          draggable={false}
-          alt=""
-          decoding="async"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-neutral-600">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-700 border-t-neutral-400" />
-        </div>
-      )}
+      <img
+        src={src}
+        width={cellPx}
+        height={cellH}
+        className="h-full w-full object-cover pointer-events-none"
+        draggable={false}
+        alt=""
+        decoding="async"
+      />
     </div>
   );
 }

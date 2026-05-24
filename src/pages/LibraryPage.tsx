@@ -1,4 +1,5 @@
 /** Экран Library: импорт фото, прогресс обработки, виртуализированная сетка миниатюр. */
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,22 +14,27 @@ export function LibraryPage() {
   const [current, total] = useAppStore((s) => s.processingProgress);
 
   const { runImport } = useImport();
+  // Ref чтобы listener регистрировался один раз, но всегда вызывал актуальный runImport
+  const runImportRef = useRef(runImport);
   const [isDragOver, setIsDragOver] = useState(false);
-  const dragCounterRef = useRef(0); // счётчик для корректного drag enter/leave
+  const dragCounterRef = useRef(0);
 
-  // Слушаем системный drag-drop от ОС (Tauri v2)
+  useEffect(() => {
+    runImportRef.current = runImport;
+  }, [runImport]);
+
+  // Регистрируем системный drag-drop и drag-визуализацию только один раз
   useEffect(() => {
     let unlisten: (() => void) | undefined;
 
     listen<{ paths: string[] }>("tauri://drag-drop", (event) => {
       setIsDragOver(false);
       dragCounterRef.current = 0;
-      runImport(event.payload.paths);
+      runImportRef.current(event.payload.paths);
     }).then((fn) => {
       unlisten = fn;
     });
 
-    // Визуальная подсветка зоны при наведении файла из ОС
     const onDragEnter = () => {
       dragCounterRef.current++;
       setIsDragOver(true);
@@ -40,23 +46,34 @@ export function LibraryPage() {
         setIsDragOver(false);
       }
     };
+    const onDragOver = (e: DragEvent) => e.preventDefault();
 
     window.addEventListener("dragenter", onDragEnter);
     window.addEventListener("dragleave", onDragLeave);
-    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("dragover", onDragOver);
 
     return () => {
       unlisten?.();
       window.removeEventListener("dragenter", onDragEnter);
       window.removeEventListener("dragleave", onDragLeave);
+      window.removeEventListener("dragover", onDragOver);
     };
-  }, [runImport]);
+  }, []);
+
+  const handleImportClick = async () => {
+    const result = await openDialog({
+      multiple: true,
+      filters: [{ name: "Images", extensions: ["jpg", "jpeg", "png"] }],
+    });
+    if (!result) return;
+    const paths = Array.isArray(result) ? result : [result];
+    if (paths.length > 0) runImportRef.current(paths);
+  };
 
   const isEmpty = photos.length === 0;
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      {/* Прогресс-бар */}
       {isProcessing && (
         <ProgressBar
           current={current}
@@ -65,13 +82,17 @@ export function LibraryPage() {
         />
       )}
 
-      {/* Пустое состояние — большая дроп-зона */}
-      {isEmpty && !isProcessing && <DropZoneEmpty isDragOver={isDragOver} />}
+      {isEmpty && !isProcessing && (
+        <DropZoneEmpty isDragOver={isDragOver} onImportClick={handleImportClick} />
+      )}
 
-      {/* Сетка миниатюр */}
-      {!isEmpty && <ThumbnailGrid photos={photos} />}
+      {!isEmpty && (
+        <>
+          <LibraryToolbar onImportClick={handleImportClick} isProcessing={isProcessing} />
+          <ThumbnailGrid photos={photos} />
+        </>
+      )}
 
-      {/* Полупрозрачный оверлей при перетаскивании поверх фото */}
       {isDragOver && !isEmpty && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-neutral-900/60 backdrop-blur-sm">
           <DropHint />
@@ -81,7 +102,33 @@ export function LibraryPage() {
   );
 }
 
-function DropZoneEmpty({ isDragOver }: { isDragOver: boolean }) {
+function LibraryToolbar({
+  onImportClick,
+  isProcessing,
+}: {
+  onImportClick: () => void;
+  isProcessing: boolean;
+}) {
+  return (
+    <div className="flex items-center border-b border-neutral-800 px-4 py-2">
+      <button
+        onClick={onImportClick}
+        disabled={isProcessing}
+        className="rounded border border-neutral-700 px-3 py-1 text-xs text-neutral-300 transition-colors hover:border-neutral-500 hover:text-neutral-100 disabled:opacity-40"
+      >
+        + Import photos
+      </button>
+    </div>
+  );
+}
+
+function DropZoneEmpty({
+  isDragOver,
+  onImportClick,
+}: {
+  isDragOver: boolean;
+  onImportClick: () => void;
+}) {
   return (
     <div
       className={[
@@ -110,6 +157,12 @@ function DropZoneEmpty({ isDragOver }: { isDragOver: boolean }) {
         </p>
         <p className="mt-1 text-xs text-neutral-600">JPG and PNG supported</p>
       </div>
+      <button
+        onClick={onImportClick}
+        className="rounded border border-neutral-700 px-4 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-200"
+      >
+        or choose files…
+      </button>
     </div>
   );
 }

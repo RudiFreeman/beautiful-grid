@@ -57,28 +57,23 @@ export function ThumbnailGrid({ photos }: Props) {
 }
 
 function Thumbnail({ photo }: { photo: Photo }) {
-  const src = photo.thumbPath ? convertFileSrc(photo.thumbPath) : null;
+  // thumbPath предпочтительнее (меньше размер), но если не готов — показываем оригинал
+  const src = convertFileSrc(photo.thumbPath ?? photo.path);
 
   return (
     <div
       className="overflow-hidden rounded bg-neutral-800"
       style={{ width: THUMB_W, height: THUMB_H, flexShrink: 0 }}
     >
-      {src ? (
-        <img
-          src={src}
-          width={THUMB_W}
-          height={THUMB_H}
-          className="h-full w-full object-cover"
-          loading="lazy"
-          alt=""
-          decoding="async"
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-600 border-t-neutral-300" />
-        </div>
-      )}
+      <img
+        src={src}
+        width={THUMB_W}
+        height={THUMB_H}
+        className="h-full w-full object-cover"
+        loading="lazy"
+        alt=""
+        decoding="async"
+      />
 
       {/* Цветовая полоска снизу */}
       {photo.dominantColor && (
