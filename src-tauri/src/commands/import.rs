@@ -43,14 +43,13 @@ pub async fn import_photos(app: AppHandle, paths: Vec<String>) -> Result<Vec<Pho
         // Миниатюра не критична — продолжаем импорт даже при ошибке.
         // generate_thumbnail уже открывает изображение, поэтому берём размеры оттуда бесплатно.
         // Если генерация провалилась — читаем размеры отдельно (только заголовок).
-        let (thumb_path, width, height) =
-            match generate_thumbnail(&file_path, &cache_dir, &id) {
-                Ok((path, w, h)) => (Some(path.to_string_lossy().into_owned()), w, h),
-                Err(_) => {
-                    let (w, h) = read_dimensions(&file_path).unwrap_or((0, 0));
-                    (None, w, h)
-                }
-            };
+        let (thumb_path, width, height) = match generate_thumbnail(&file_path, &cache_dir, &id) {
+            Ok((path, w, h)) => (Some(path.to_string_lossy().into_owned()), w, h),
+            Err(_) => {
+                let (w, h) = read_dimensions(&file_path).unwrap_or((0, 0));
+                (None, w, h)
+            }
+        };
 
         photos.push(Photo {
             id,

@@ -28,8 +28,6 @@ export function LibraryPage() {
   // как promise разрешился — немедленно отписываемся.
   useEffect(() => {
     let aborted = false;
-    let unlisten: (() => void) | undefined;
-
     let unlistenDrop: (() => void) | undefined;
     let unlistenEnter: (() => void) | undefined;
     let unlistenLeave: (() => void) | undefined;
