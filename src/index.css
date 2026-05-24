@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/*
+  Тёмная тема по умолчанию — важно для корректной оценки цветов фото.
+  Переключение на светлую тему: добавить класс .light на <html>.
+*/
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    @apply bg-neutral-950 text-neutral-100 antialiased;
+  }
+
+  * {
+    @apply border-neutral-800;
+  }
+}
