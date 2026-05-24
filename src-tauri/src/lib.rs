@@ -6,6 +6,7 @@ mod project;
 
 use commands::{
     analyze_colors, export_grid, import_photos, new_project, open_project, save_project,
+    sort_photos_by_color,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -15,6 +16,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             import_photos,
             analyze_colors,
+            sort_photos_by_color,
             export_grid,
             new_project,
             save_project,
