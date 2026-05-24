@@ -121,7 +121,15 @@ export function ThumbnailGrid({ photos }: Props) {
   );
 }
 
-function Thumbnail({ photo, width, height }: { photo: Photo; width: number; height: number }) {
+function Thumbnail({
+  photo,
+  width,
+  height,
+}: {
+  photo: Photo;
+  width: number;
+  height: number;
+}) {
   const src = convertFileSrc(photo.thumbPath ?? photo.path);
 
   return (

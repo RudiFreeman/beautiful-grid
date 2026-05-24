@@ -202,8 +202,7 @@ interface VirtualGridProps {
 }
 
 function cellHeight(photo: Photo, cellPx: number): number {
-  const ratio =
-    photo.width > 0 && photo.height > 0 ? photo.height / photo.width : 4 / 3;
+  const ratio = photo.width > 0 && photo.height > 0 ? photo.height / photo.width : 4 / 3;
   return Math.round(cellPx * ratio);
 }
 
@@ -235,7 +234,8 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
           const start = vRow.index * columns;
           const rowPhotos = photos.slice(start, start + columns);
 
-          const rowH = (rowHeights[vRow.index] ?? Math.round(cellPx * (4 / 3)) + gap) - gap;
+          const rowH =
+            (rowHeights[vRow.index] ?? Math.round(cellPx * (4 / 3)) + gap) - gap;
 
           return (
             <div

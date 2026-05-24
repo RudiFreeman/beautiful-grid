@@ -52,7 +52,14 @@ export function ExportPage() {
 
     try {
       const photoRefs = photos.map((p) => ({ id: p.id, path: p.path }));
-      await exportGrid({ photos: photoRefs, gridOrder, columns, outputPath, format, quality });
+      await exportGrid({
+        photos: photoRefs,
+        gridOrder,
+        columns,
+        outputPath,
+        format,
+        quality,
+      });
       setDone(true);
     } catch (err) {
       setExportError(String(err));
@@ -112,7 +119,9 @@ export function ExportPage() {
               onChange={(e) => setQuality(Number(e.target.value))}
               className="w-40 accent-neutral-300"
             />
-            <span className="w-8 text-right font-mono text-sm text-neutral-300">{quality}</span>
+            <span className="w-8 text-right font-mono text-sm text-neutral-300">
+              {quality}
+            </span>
           </div>
         )}
 

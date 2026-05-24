@@ -195,7 +195,11 @@ function SkeletonGrid({ count }: { count: number }) {
   return (
     <div className="flex-1 overflow-hidden p-2">
       {Array.from({ length: rows }).map((_, r) => (
-        <div key={r} className="flex" style={{ gap: SKELETON_GAP, marginBottom: SKELETON_GAP }}>
+        <div
+          key={r}
+          className="flex"
+          style={{ gap: SKELETON_GAP, marginBottom: SKELETON_GAP }}
+        >
           {Array.from({ length: Math.min(SKELETON_COLS, count - r * SKELETON_COLS) }).map(
             (_, c) => (
               <div
