@@ -1,5 +1,5 @@
 /** Одноразовое приветственное модальное окно при первом запуске. */
-import { open as openUrl } from "@tauri-apps/plugin-opener";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useEffect, useState } from "react";
 
 import { DONATE_URLS } from "../config/donate";
