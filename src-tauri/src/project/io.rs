@@ -64,6 +64,8 @@ mod tests {
             thumb_path: Some(".cache/abc-123.webp".to_string()),
             dominant_color: Some([180, 120, 90]),
             exif_date: None,
+            width: 3024,
+            height: 4032,
         });
         project.grid_order.push("abc-123".to_string());
 
@@ -97,8 +99,8 @@ mod tests {
 
         let raw = std::fs::read_to_string(file.path()).unwrap();
         let val: serde_json::Value = serde_json::from_str(&raw).unwrap();
-        assert_eq!(val["project_name"], "JSON Check");
+        assert_eq!(val["projectName"], "JSON Check");
         assert_eq!(val["version"], 1);
-        assert!(val["grid_order"].as_array().unwrap().is_empty());
+        assert!(val["gridOrder"].as_array().unwrap().is_empty());
     }
 }

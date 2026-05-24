@@ -7,9 +7,15 @@ import type { Photo } from "../types";
 
 const COLS = 6;
 const THUMB_W = 156;
-const THUMB_H = 117; // 4:3
 const GAP = 4;
-const ROW_H = THUMB_H + GAP;
+const FALLBACK_RATIO = 4 / 3; // используется если размеры не известны
+
+function thumbHeight(photo: Photo): number {
+  if (photo.width > 0 && photo.height > 0) {
+    return Math.round(THUMB_W * (photo.height / photo.width));
+  }
+  return Math.round(THUMB_W * FALLBACK_RATIO);
+}
 
 interface Props {
   photos: Photo[];
@@ -20,11 +26,17 @@ export function ThumbnailGrid({ photos }: Props) {
 
   const rowCount = Math.ceil(photos.length / COLS);
 
+  // Высота каждой строки = максимальная высота фото в строке + отступ
+  const rowHeights = Array.from({ length: rowCount }, (_, r) => {
+    const rowPhotos = photos.slice(r * COLS, (r + 1) * COLS);
+    return Math.max(...rowPhotos.map(thumbHeight)) + GAP;
+  });
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => ROW_H,
+    estimateSize: (i) => rowHeights[i] ?? Math.round(THUMB_W * FALLBACK_RATIO) + GAP,
     overscan: 4,
   });
 
@@ -59,16 +71,17 @@ export function ThumbnailGrid({ photos }: Props) {
 function Thumbnail({ photo }: { photo: Photo }) {
   // thumbPath предпочтительнее (меньше размер), но если не готов — показываем оригинал
   const src = convertFileSrc(photo.thumbPath ?? photo.path);
+  const h = thumbHeight(photo);
 
   return (
     <div
       className="overflow-hidden rounded bg-neutral-800"
-      style={{ width: THUMB_W, height: THUMB_H, flexShrink: 0 }}
+      style={{ width: THUMB_W, height: h, flexShrink: 0 }}
     >
       <img
         src={src}
         width={THUMB_W}
-        height={THUMB_H}
+        height={h}
         className="h-full w-full object-cover"
         loading="lazy"
         alt=""

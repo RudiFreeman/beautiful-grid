@@ -6,7 +6,10 @@ use tauri::{AppHandle, Emitter, Manager};
 use uuid::Uuid;
 use walkdir::WalkDir;
 
-use crate::{image::thumbs::generate_thumbnail, project::model::Photo};
+use crate::{
+    image::thumbs::{generate_thumbnail, read_dimensions},
+    project::model::Photo,
+};
 
 /// Полезная нагрузка события прогресса импорта.
 #[derive(serde::Serialize, Clone)]
@@ -37,10 +40,17 @@ pub async fn import_photos(app: AppHandle, paths: Vec<String>) -> Result<Vec<Pho
     for (i, file_path) in files.into_iter().enumerate() {
         let id = Uuid::new_v4().to_string();
 
-        // Миниатюра не критична — продолжаем импорт даже при ошибке
-        let thumb_path = generate_thumbnail(&file_path, &cache_dir, &id)
-            .ok()
-            .map(|p| p.to_string_lossy().into_owned());
+        // Миниатюра не критична — продолжаем импорт даже при ошибке.
+        // generate_thumbnail уже открывает изображение, поэтому берём размеры оттуда бесплатно.
+        // Если генерация провалилась — читаем размеры отдельно (только заголовок).
+        let (thumb_path, width, height) =
+            match generate_thumbnail(&file_path, &cache_dir, &id) {
+                Ok((path, w, h)) => (Some(path.to_string_lossy().into_owned()), w, h),
+                Err(_) => {
+                    let (w, h) = read_dimensions(&file_path).unwrap_or((0, 0));
+                    (None, w, h)
+                }
+            };
 
         photos.push(Photo {
             id,
@@ -48,6 +58,8 @@ pub async fn import_photos(app: AppHandle, paths: Vec<String>) -> Result<Vec<Pho
             thumb_path,
             dominant_color: None,
             exif_date: None,
+            width,
+            height,
         });
 
         let _ = app.emit(

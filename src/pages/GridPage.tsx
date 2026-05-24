@@ -201,16 +201,26 @@ interface VirtualGridProps {
   activeId: string | null;
 }
 
+function cellHeight(photo: Photo, cellPx: number): number {
+  const ratio =
+    photo.width > 0 && photo.height > 0 ? photo.height / photo.width : 4 / 3;
+  return Math.round(cellPx * ratio);
+}
+
 function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProps) {
   const parentRef = useRef<HTMLDivElement>(null);
   const rowCount = Math.ceil(photos.length / columns);
-  const rowH = cellPx * 0.75 + gap; // 4:3 cells
+
+  const rowHeights = Array.from({ length: rowCount }, (_, r) => {
+    const rowPhotos = photos.slice(r * columns, (r + 1) * columns);
+    return Math.max(...rowPhotos.map((p) => cellHeight(p, cellPx))) + gap;
+  });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => rowH,
+    estimateSize: (i) => rowHeights[i] ?? Math.round(cellPx * (4 / 3)) + gap,
     overscan: 3,
   });
 
@@ -285,7 +295,7 @@ function GridCell({
   isDragging?: boolean;
 }) {
   const src = convertFileSrc(photo.thumbPath ?? photo.path);
-  const cellH = Math.round(cellPx * 0.75); // 4:3
+  const cellH = cellHeight(photo, cellPx);
 
   return (
     <div
