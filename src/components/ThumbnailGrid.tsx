@@ -6,7 +6,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import type { Photo } from "../types";
 
 const COLS = 6;
-const TARGET_ROW_H = 156;
+const TARGET_ROW_H = 200;
 const GAP = 4;
 
 function naturalWidthAtTargetH(photo: Photo): number {
@@ -112,7 +112,7 @@ function Thumbnail({ photo, width, height }: { photo: Photo; width: number; heig
 
   return (
     <div
-      className="overflow-hidden rounded bg-neutral-800"
+      className="relative overflow-hidden rounded bg-neutral-800"
       style={{ width, height, flexShrink: 0 }}
     >
       <img
@@ -127,7 +127,7 @@ function Thumbnail({ photo, width, height }: { photo: Photo; width: number; heig
 
       {photo.dominantColor && (
         <div
-          className="h-0.5 w-full"
+          className="absolute bottom-0 left-0 h-3 w-full"
           style={{ background: `rgb(${photo.dominantColor.join(",")})` }}
         />
       )}
