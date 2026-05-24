@@ -43,9 +43,7 @@ export function GridPage() {
 
   // Строим map id → photo для быстрого доступа
   const photoMap = Object.fromEntries(photos.map((p) => [p.id, p]));
-  const orderedPhotos = gridOrder
-    .map((id) => photoMap[id])
-    .filter(Boolean) as Photo[];
+  const orderedPhotos = gridOrder.map((id) => photoMap[id]).filter(Boolean) as Photo[];
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -134,9 +132,7 @@ export function GridPage() {
         </SortableContext>
 
         <DragOverlay>
-          {activePhoto && (
-            <GridCell photo={activePhoto} cellPx={CELL_PX} isDragging />
-          )}
+          {activePhoto && <GridCell photo={activePhoto} cellPx={CELL_PX} isDragging />}
         </DragOverlay>
       </DndContext>
     </div>
@@ -224,10 +220,7 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
       className="flex-1 overflow-y-auto p-2"
       style={{ contain: "strict" }}
     >
-      <div
-        className="relative w-full"
-        style={{ height: rowVirtualizer.getTotalSize() }}
-      >
+      <div className="relative w-full" style={{ height: rowVirtualizer.getTotalSize() }}>
         {rowVirtualizer.getVirtualItems().map((vRow) => {
           const start = vRow.index * columns;
           const rowPhotos = photos.slice(start, start + columns);
@@ -265,8 +258,9 @@ function SortableCell({
   cellPx: number;
   isActive: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: photo.id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: photo.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),

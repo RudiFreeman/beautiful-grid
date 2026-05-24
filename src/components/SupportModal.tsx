@@ -30,11 +30,7 @@ export function SupportModal({ onClose }: Props) {
             url={DONATE_URLS.buyMeACoffee}
             onOpen={handleOpen}
           />
-          <PlatformButton
-            label="Boosty"
-            url={DONATE_URLS.boosty}
-            onOpen={handleOpen}
-          />
+          <PlatformButton label="Boosty" url={DONATE_URLS.boosty} onOpen={handleOpen} />
           <PlatformButton
             label="GitHub Sponsors"
             url={DONATE_URLS.githubSponsors}

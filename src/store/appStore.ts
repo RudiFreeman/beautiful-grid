@@ -35,8 +35,7 @@ export const useAppStore = create<AppState>()((set) => ({
 
   setProjectName: (name) => set({ projectName: name }),
 
-  setPhotos: (photos) =>
-    set({ photos, gridOrder: photos.map((p) => p.id) }),
+  setPhotos: (photos) => set({ photos, gridOrder: photos.map((p) => p.id) }),
 
   addPhotos: (incoming) =>
     set((s) => {
@@ -57,8 +56,7 @@ export const useAppStore = create<AppState>()((set) => ({
 
   setGridOrder: (order) => set({ gridOrder: order }),
 
-  setColumns: (columns) =>
-    set((s) => ({ settings: { ...s.settings, columns } })),
+  setColumns: (columns) => set((s) => ({ settings: { ...s.settings, columns } })),
 
   setProcessing: (active, current = 0, total = 0) =>
     set({ isProcessing: active, processingProgress: [current, total] }),

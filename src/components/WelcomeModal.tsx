@@ -7,9 +7,7 @@ import { DONATE_URLS } from "../config/donate";
 const STORAGE_KEY = "bg_welcome_seen";
 
 export function WelcomeModal() {
-  const [visible, setVisible] = useState(
-    () => !localStorage.getItem(STORAGE_KEY),
-  );
+  const [visible, setVisible] = useState(() => !localStorage.getItem(STORAGE_KEY));
 
   const handleClose = () => {
     localStorage.setItem(STORAGE_KEY, "1");
@@ -25,15 +23,12 @@ export function WelcomeModal() {
           Welcome to Beautiful Grid
         </h2>
         <p className="mb-4 text-sm text-neutral-400">
-          This is a free, open-source app. If it saves you time, consider
-          supporting its development.
+          This is a free, open-source app. If it saves you time, consider supporting its
+          development.
         </p>
 
         <div className="mb-5 flex flex-col gap-2">
-          <DonateButton
-            label="Buy Me a Coffee"
-            url={DONATE_URLS.buyMeACoffee}
-          />
+          <DonateButton label="Buy Me a Coffee" url={DONATE_URLS.buyMeACoffee} />
           <DonateButton label="Boosty" url={DONATE_URLS.boosty} />
           <DonateButton label="GitHub Sponsors" url={DONATE_URLS.githubSponsors} />
         </div>

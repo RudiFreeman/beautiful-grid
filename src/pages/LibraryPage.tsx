@@ -66,9 +66,7 @@ export function LibraryPage() {
       )}
 
       {/* Пустое состояние — большая дроп-зона */}
-      {isEmpty && !isProcessing && (
-        <DropZoneEmpty isDragOver={isDragOver} />
-      )}
+      {isEmpty && !isProcessing && <DropZoneEmpty isDragOver={isDragOver} />}
 
       {/* Сетка миниатюр */}
       {!isEmpty && <ThumbnailGrid photos={photos} />}

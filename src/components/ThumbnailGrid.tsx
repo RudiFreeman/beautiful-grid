@@ -34,10 +34,7 @@ export function ThumbnailGrid({ photos }: Props) {
       className="flex-1 overflow-y-auto p-2"
       style={{ contain: "strict" }}
     >
-      <div
-        className="relative w-full"
-        style={{ height: rowVirtualizer.getTotalSize() }}
-      >
+      <div className="relative w-full" style={{ height: rowVirtualizer.getTotalSize() }}>
         {rowVirtualizer.getVirtualItems().map((vRow) => {
           const start = vRow.index * COLS;
           const rowPhotos = photos.slice(start, start + COLS);

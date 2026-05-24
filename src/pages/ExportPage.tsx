@@ -119,15 +119,9 @@ export function ExportPage() {
       </div>
 
       {isExporting && (
-        <ProgressBar
-          current={progress[0]}
-          total={progress[1]}
-          label="Exporting…"
-        />
+        <ProgressBar current={progress[0]} total={progress[1]} label="Exporting…" />
       )}
-      {done && !isExporting && (
-        <p className="text-sm text-green-400">Export complete!</p>
-      )}
+      {done && !isExporting && <p className="text-sm text-green-400">Export complete!</p>}
 
       <button
         onClick={handleExport}
