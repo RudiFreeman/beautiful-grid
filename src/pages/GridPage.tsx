@@ -210,6 +210,7 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
   const rowCount = Math.ceil(photos.length / columns);
   const rowH = cellPx * 0.75 + gap; // 4:3 cells
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,

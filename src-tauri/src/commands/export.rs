@@ -73,7 +73,12 @@ pub async fn export_grid(
         let cell = load_cell(Path::new(img_path))?;
         let col = (i as u32) % columns;
         let row = (i as u32) / columns;
-        imageops::replace(&mut canvas, &cell, (col * CELL_W) as i64, (row * CELL_H) as i64);
+        imageops::replace(
+            &mut canvas,
+            &cell,
+            (col * CELL_W) as i64,
+            (row * CELL_H) as i64,
+        );
 
         let _ = app.emit(
             "export:progress",
@@ -89,8 +94,8 @@ pub async fn export_grid(
 
 /// Загружает изображение и обрезает его по центру до размера CELL_W × CELL_H.
 fn load_cell(path: &Path) -> Result<RgbImage, String> {
-    let img = image::open(path)
-        .map_err(|e| format!("Не удалось открыть {}: {e}", path.display()))?;
+    let img =
+        image::open(path).map_err(|e| format!("Не удалось открыть {}: {e}", path.display()))?;
 
     // Масштабируем так, чтобы оба размера были ≥ размера ячейки
     let src_w = img.width() as f64;

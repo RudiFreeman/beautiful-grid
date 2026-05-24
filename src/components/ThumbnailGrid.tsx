@@ -20,6 +20,7 @@ export function ThumbnailGrid({ photos }: Props) {
 
   const rowCount = Math.ceil(photos.length / COLS);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,

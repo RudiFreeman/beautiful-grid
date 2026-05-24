@@ -1,7 +1,9 @@
 //! Tauri-команды для управления проектом: создание, сохранение, загрузка.
 
 use crate::project::{
-    io::{new_project as make_project, open_project as load_from_disk, save_project as write_to_disk},
+    io::{
+        new_project as make_project, open_project as load_from_disk, save_project as write_to_disk,
+    },
     Project,
 };
 

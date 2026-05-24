@@ -1,19 +1,15 @@
 /** Одноразовое приветственное модальное окно при первом запуске. */
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { DONATE_URLS } from "../config/donate";
 
 const STORAGE_KEY = "bg_welcome_seen";
 
 export function WelcomeModal() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      setVisible(true);
-    }
-  }, []);
+  const [visible, setVisible] = useState(
+    () => !localStorage.getItem(STORAGE_KEY),
+  );
 
   const handleClose = () => {
     localStorage.setItem(STORAGE_KEY, "1");

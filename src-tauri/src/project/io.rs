@@ -20,22 +20,21 @@ pub fn new_project(name: impl Into<String>) -> Project {
 
 /// Сохраняет проект в файл .bgrid по указанному пути.
 pub fn save_project(project: &Project, path: impl AsRef<Path>) -> Result<(), String> {
-    let json = serde_json::to_string_pretty(project)
-        .map_err(|e| format!("Ошибка сериализации: {e}"))?;
+    let json =
+        serde_json::to_string_pretty(project).map_err(|e| format!("Ошибка сериализации: {e}"))?;
     std::fs::write(path, json).map_err(|e| format!("Ошибка записи файла: {e}"))
 }
 
 /// Загружает проект из файла .bgrid.
 pub fn open_project(path: impl AsRef<Path>) -> Result<Project, String> {
-    let json = std::fs::read_to_string(path)
-        .map_err(|e| format!("Ошибка чтения файла: {e}"))?;
+    let json = std::fs::read_to_string(path).map_err(|e| format!("Ошибка чтения файла: {e}"))?;
     serde_json::from_str(&json).map_err(|e| format!("Ошибка десериализации: {e}"))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::model::Photo;
+    use super::*;
     use tempfile::NamedTempFile;
 
     #[test]

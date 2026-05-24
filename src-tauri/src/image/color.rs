@@ -73,7 +73,10 @@ pub fn sort_by_hsl(photos: &[(String, [u8; 3])]) -> Vec<String> {
             .then(a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal))
     });
 
-    indexed.into_iter().map(|(_, _, _, id)| id.to_string()).collect()
+    indexed
+        .into_iter()
+        .map(|(_, _, _, id)| id.to_string())
+        .collect()
 }
 
 #[cfg(test)]
@@ -85,20 +88,29 @@ mod tests {
         let (h, s, l) = rgb_to_hsl([255, 0, 0]);
         assert!((h - 0.0).abs() < 1.0, "hue of red should be ~0, got {h}");
         assert!(s > 0.9, "saturation of red should be ~1, got {s}");
-        assert!((l - 0.5).abs() < 0.01, "lightness of red should be ~0.5, got {l}");
+        assert!(
+            (l - 0.5).abs() < 0.01,
+            "lightness of red should be ~0.5, got {l}"
+        );
     }
 
     #[test]
     fn rgb_to_hsl_green() {
         let (h, s, _) = rgb_to_hsl([0, 255, 0]);
-        assert!((h - 120.0).abs() < 1.0, "hue of green should be ~120, got {h}");
+        assert!(
+            (h - 120.0).abs() < 1.0,
+            "hue of green should be ~120, got {h}"
+        );
         assert!(s > 0.9);
     }
 
     #[test]
     fn rgb_to_hsl_blue() {
         let (h, s, _) = rgb_to_hsl([0, 0, 255]);
-        assert!((h - 240.0).abs() < 1.0, "hue of blue should be ~240, got {h}");
+        assert!(
+            (h - 240.0).abs() < 1.0,
+            "hue of blue should be ~240, got {h}"
+        );
         assert!(s > 0.9);
     }
 
