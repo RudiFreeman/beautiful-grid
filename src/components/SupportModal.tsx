@@ -1,5 +1,5 @@
 /** Модальное окно выбора платформы доната. */
-import { open as openUrl } from "@tauri-apps/plugin-opener";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { DONATE_URLS } from "../config/donate";
 
