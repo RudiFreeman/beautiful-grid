@@ -6,6 +6,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-25
+
+Sprint 1.1 — bug fixes and UX polish across the full app.
+
+### Fixed
+- **Photos not displaying** — added `asset` protocol in `tauri.conf.json`; `convertFileSrc` now resolves thumbnails correctly on both macOS and Windows.
+- **Duplicate photos on re-import** — deduplication by file path prevents adding the same photo twice; React Strict Mode double-invocation guard added to the import listener.
+- **Blank screen during import** — skeleton placeholders shown immediately while thumbnails are generated; spinner no longer shown on an empty Library.
+- **Save button gave no feedback** — fixed `serde` camelCase/snake_case mismatch so `save_project` succeeds; button now shows "Saved ✓" on success.
+- **Unequal row heights in Library** — replaced per-photo fixed-width grid with justified layout: all photos in a row share the same height, widths scale proportionally to fill the container.
+- **Unequal row heights in Grid** — row height is now passed to every `GridCell`; landscape photos no longer appear shorter than portraits in the same row.
+- **Drop zone highlight missing** — swapped `window dragenter/dragleave` for `tauri://drag-enter` / `tauri://drag-leave` events so the zone highlights when dragging from Finder.
+- **Color strip invisible** — changed to `absolute bottom-0` so the dominant-color bar is always visible over the image.
+- **Grid layout breaks on window resize** — `rowVirtualizer.measure()` is called when `containerWidth` changes, forcing all row sizes to recompute.
+- **Last row ignores resize** — incomplete last row now scales down on narrow windows but is not stretched when wider (standard justified-layout behaviour).
+- **New project skipped confirmation** — replaced `window.confirm()` (ignored by Tauri's WebView) with a custom modal: Save project / Discard / Cancel; shown whenever photos are loaded.
+- **Export errors were silent** — errors from `export_grid` are now displayed inline on the Export page.
+
+### Changed
+- **Library thumbnail size** — default row height increased 156 → 200 px for better visibility.
+- **Color strip thickness** — dominant-color bar increased 2 → 12 px.
+- **Save button state** — shows "Saved ✓" when project is clean, "Save" when there are unsaved changes; updates immediately after Save or Open.
+- **Export UX** — "Save as…" path picker is now separate from Export button; chosen path displayed in full; Export disabled until path is selected.
+
+[Unreleased]: https://github.com/RudiFreeman/beautiful-grid/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/RudiFreeman/beautiful-grid/compare/v1.0.0...v1.1.0
+
 ## [1.0.0] — 2026-05-24
 
 Sprint 1 — MVP core. First public release.
