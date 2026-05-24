@@ -10,6 +10,9 @@ target/
 src-tauri/target/
 # Tauri-генерируемые схемы (создаются при сборке)
 src-tauri/gen/
+# Mobile icons (создаются при `tauri icon`, не нужны для desktop-сборки)
+src-tauri/icons/android/
+src-tauri/icons/ios/
 
 # Editor / OS
 .DS_Store
