@@ -31,7 +31,7 @@ Sprint 0 → Sprint 1  ━━━━━ v1.0 MVP cut-off ━━━━━  Sprint 
 
 ---
 
-## Sprint 0 — Setup проекта `[v1.0 MVP]` · `In progress`
+## Sprint 0 — Setup проекта `[v1.0 MVP]` · `Done` (v0.1.0-alpha)
 
 **Цель.** Подготовить фундамент проекта: рабочий каркас Tauri+React, CI, лицензия, README, иконка. После этого спринта можно писать продуктовые фичи.
 
