@@ -1,6 +1,6 @@
 # Beautiful Grid
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue) ![Tauri](https://img.shields.io/badge/tauri-2.11-blue) ![React](https://img.shields.io/badge/react-19.2-blue) ![TypeScript](https://img.shields.io/badge/typescript-6.0-blue) ![Vite](https://img.shields.io/badge/vite-8.0-blue) ![Tailwind](https://img.shields.io/badge/tailwind-4.3-blue) ![Zustand](https://img.shields.io/badge/zustand-5.0-blue) ![Rust](https://img.shields.io/badge/rust-stable-orange)
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen?style=flat-square) ![Platform](https://img.shields.io/badge/platform-macOS_%7C_Windows-blue?style=flat-square) ![Tauri](https://img.shields.io/badge/tauri-2.11-blue?style=flat-square) ![React](https://img.shields.io/badge/react-19.2-blue?style=flat-square) ![TypeScript](https://img.shields.io/badge/typescript-6.0-blue?style=flat-square) ![Vite](https://img.shields.io/badge/vite-8.0-blue?style=flat-square) ![Tailwind](https://img.shields.io/badge/tailwind-4.3-blue?style=flat-square) ![Zustand](https://img.shields.io/badge/zustand-5.0-blue?style=flat-square) ![Rust](https://img.shields.io/badge/rust-stable-orange?style=flat-square)
 
 > Beautiful, local, open-source photo grid composer for photographers and designers.
 
