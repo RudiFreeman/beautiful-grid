@@ -86,6 +86,9 @@ export function LibraryPage() {
         <DropZoneEmpty isDragOver={isDragOver} onImportClick={handleImportClick} />
       )}
 
+      {/* Скелетоны во время первого импорта когда photos ещё пусты */}
+      {isEmpty && isProcessing && total > 0 && <SkeletonGrid count={total} />}
+
       {!isEmpty && (
         <>
           <LibraryToolbar onImportClick={handleImportClick} isProcessing={isProcessing} />
@@ -171,6 +174,32 @@ function DropHint() {
   return (
     <div className="rounded-xl border border-neutral-600 bg-neutral-900/90 px-8 py-6 text-center shadow-xl">
       <p className="text-sm font-medium text-neutral-200">Drop to add photos</p>
+    </div>
+  );
+}
+
+const SKELETON_COLS = 6;
+const SKELETON_W = 156;
+const SKELETON_H = 117;
+const SKELETON_GAP = 4;
+
+function SkeletonGrid({ count }: { count: number }) {
+  const rows = Math.ceil(count / SKELETON_COLS);
+  return (
+    <div className="flex-1 overflow-hidden p-2">
+      {Array.from({ length: rows }).map((_, r) => (
+        <div key={r} className="flex" style={{ gap: SKELETON_GAP, marginBottom: SKELETON_GAP }}>
+          {Array.from({ length: Math.min(SKELETON_COLS, count - r * SKELETON_COLS) }).map(
+            (_, c) => (
+              <div
+                key={c}
+                className="animate-pulse rounded bg-neutral-800"
+                style={{ width: SKELETON_W, height: SKELETON_H, flexShrink: 0 }}
+              />
+            ),
+          )}
+        </div>
+      ))}
     </div>
   );
 }
