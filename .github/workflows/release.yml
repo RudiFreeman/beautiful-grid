@@ -1,0 +1,87 @@
+name: Release
+
+# Запускается только при пуше тега вида v* (например v1.0.0)
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  # ── macOS arm64 — DMG ────────────────────────────────────────────────────────
+  release-macos:
+    name: Release (macOS arm64)
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Tauri app (arm64)
+        run: npm run tauri build -- --target aarch64-apple-darwin
+        env:
+          # Подпись отключена для самоподписанных сборок (без Apple Developer ID)
+          TAURI_SIGNING_PRIVATE_KEY: ""
+
+      - name: Upload DMG to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          draft: false
+          fail_on_unmatched_files: true
+
+  # ── Windows x64 — MSI ────────────────────────────────────────────────────────
+  release-windows:
+    name: Release (Windows x64)
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Tauri app (Windows x64)
+        run: npm run tauri build -- --target x86_64-pc-windows-msvc
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ""
+
+      - name: Upload MSI to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          draft: false
+          fail_on_unmatched_files: true

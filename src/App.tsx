@@ -1,6 +1,7 @@
 /** Корневой компонент: роутер + глобальная раскладка (NavBar + контент страницы). */
 import { Navigate, Route, Routes } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
+import { WelcomeModal } from "./components/WelcomeModal";
 import { ExportPage } from "./pages/ExportPage";
 import { GridPage } from "./pages/GridPage";
 import { LibraryPage } from "./pages/LibraryPage";
@@ -8,6 +9,7 @@ import { LibraryPage } from "./pages/LibraryPage";
 export function App() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
+      <WelcomeModal />
       <NavBar />
       <main className="flex flex-1 overflow-hidden">
         <Routes>

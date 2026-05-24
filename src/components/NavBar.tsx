@@ -1,5 +1,11 @@
-/** Верхняя навигационная панель с переключением между Library / Grid / Export. */
+/** Верхняя навигация: Library / Grid / Export, управление проектом, кнопка Support. */
+import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+
+import { newProject, openProject, saveProject } from "../lib/tauri-commands";
+import { useAppStore } from "../store/appStore";
+import { SupportModal } from "./SupportModal";
 
 const NAV_ITEMS = [
   { to: "/library", label: "Library" },
@@ -8,39 +14,108 @@ const NAV_ITEMS = [
 ] as const;
 
 export function NavBar() {
-  return (
-    <header className="flex items-center justify-between border-b border-neutral-800 bg-neutral-900 px-4 py-2">
-      <span className="text-sm font-semibold tracking-wide text-neutral-100">
-        Beautiful Grid
-      </span>
+  const [showSupport, setShowSupport] = useState(false);
+  const store = useAppStore();
 
-      <nav className="flex gap-1">
-        {NAV_ITEMS.map(({ to, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              [
-                "rounded px-3 py-1 text-sm transition-colors",
-                isActive
-                  ? "bg-neutral-700 text-neutral-100"
-                  : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100",
-              ].join(" ")
-            }
+  const handleNew = async () => {
+    if (!confirm("Start a new project? Unsaved changes will be lost.")) return;
+    const project = await newProject("New Project").catch(console.error);
+    if (project) {
+      store.reset();
+      store.setProjectName(project.projectName);
+    }
+  };
+
+  const handleSave = async () => {
+    const path = await saveDialog({
+      filters: [{ name: "Beautiful Grid Project", extensions: ["bgrid"] }],
+      defaultPath: `${store.projectName}.bgrid`,
+    });
+    if (!path) return;
+
+    await saveProject(
+      {
+        projectName: store.projectName,
+        version: 1,
+        createdAt: new Date().toISOString(),
+        settings: store.settings,
+        photos: store.photos,
+        gridOrder: store.gridOrder,
+      },
+      path,
+    ).catch(console.error);
+  };
+
+  const handleOpen = async () => {
+    const path = await openDialog({
+      filters: [{ name: "Beautiful Grid Project", extensions: ["bgrid"] }],
+      multiple: false,
+    });
+    if (!path || Array.isArray(path)) return;
+
+    const project = await openProject(path as string).catch(console.error);
+    if (!project) return;
+
+    store.reset();
+    store.setProjectName(project.projectName);
+    store.setColumns(project.settings.columns);
+    store.setPhotos(project.photos);
+    store.setGridOrder(project.gridOrder);
+  };
+
+  return (
+    <>
+      <header className="flex items-center gap-2 border-b border-neutral-800 bg-neutral-900 px-4 py-2">
+        <span className="mr-1 text-sm font-semibold tracking-wide text-neutral-100">
+          Beautiful Grid
+        </span>
+
+        <nav className="flex gap-1">
+          {NAV_ITEMS.map(({ to, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                [
+                  "rounded px-3 py-1 text-sm transition-colors",
+                  isActive
+                    ? "bg-neutral-700 text-neutral-100"
+                    : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100",
+                ].join(" ")
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="flex-1" />
+
+        {/* Управление проектом */}
+        {[
+          { label: "New", action: handleNew },
+          { label: "Open", action: handleOpen },
+          { label: "Save", action: handleSave },
+        ].map(({ label, action }) => (
+          <button
+            key={label}
+            onClick={action}
+            className="rounded px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-300"
           >
             {label}
-          </NavLink>
+          </button>
         ))}
-      </nav>
 
-      {/* Кнопка «Поддержать» — URL подключаются в config/donate.ts после релиза v1.0 */}
-      <button
-        className="rounded border border-neutral-700 px-3 py-1 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-200"
-        disabled
-        title="Поддержать — появится после v1.0"
-      >
-        ♥ Support
-      </button>
-    </header>
+        {/* Кнопка Support */}
+        <button
+          onClick={() => setShowSupport(true)}
+          className="ml-1 rounded border border-neutral-700 px-3 py-1 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-200"
+        >
+          ♥ Support
+        </button>
+      </header>
+
+      {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
+    </>
   );
 }
