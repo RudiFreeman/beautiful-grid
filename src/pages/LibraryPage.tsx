@@ -23,8 +23,11 @@ export function LibraryPage() {
     runImportRef.current = runImport;
   }, [runImport]);
 
-  // Регистрируем системный drag-drop и drag-визуализацию только один раз
+  // Регистрируем системный drag-drop и drag-визуализацию только один раз.
+  // aborted-флаг защищает от React Strict Mode: если cleanup отработал до того,
+  // как promise разрешился — немедленно отписываемся.
   useEffect(() => {
+    let aborted = false;
     let unlisten: (() => void) | undefined;
 
     listen<{ paths: string[] }>("tauri://drag-drop", (event) => {
@@ -32,7 +35,8 @@ export function LibraryPage() {
       dragCounterRef.current = 0;
       runImportRef.current(event.payload.paths);
     }).then((fn) => {
-      unlisten = fn;
+      if (aborted) fn();
+      else unlisten = fn;
     });
 
     const onDragEnter = () => {
@@ -53,6 +57,7 @@ export function LibraryPage() {
     window.addEventListener("dragover", onDragOver);
 
     return () => {
+      aborted = true;
       unlisten?.();
       window.removeEventListener("dragenter", onDragEnter);
       window.removeEventListener("dragleave", onDragLeave);

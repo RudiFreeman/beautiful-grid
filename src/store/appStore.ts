@@ -39,8 +39,8 @@ export const useAppStore = create<AppState>()((set) => ({
 
   addPhotos: (incoming) =>
     set((s) => {
-      const existing = new Set(s.photos.map((p) => p.id));
-      const fresh = incoming.filter((p) => !existing.has(p.id));
+      const existingPaths = new Set(s.photos.map((p) => p.path));
+      const fresh = incoming.filter((p) => !existingPaths.has(p.path));
       return {
         photos: [...s.photos, ...fresh],
         gridOrder: [...s.gridOrder, ...fresh.map((p) => p.id)],
