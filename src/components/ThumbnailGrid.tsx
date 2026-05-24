@@ -1,7 +1,7 @@
 /** Виртуализированная сетка миниатюр для Library. Justified-layout: одинаковая высота строки, ширина пропорциональна aspect ratio. */
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { Photo } from "../types";
 
@@ -32,8 +32,18 @@ function computeLayouts(photos: Photo[], containerWidth: number): RowLayout[] {
     const isLastRow = r === rowCount - 1 && n < COLS;
 
     if (isLastRow) {
-      // Последнюю неполную строку не растягиваем
-      return { photos: rowPhotos, height: TARGET_ROW_H, widths: natWidths };
+      // Последнюю неполную строку не растягиваем, но сжимаем если не влезает
+      const totalNatWidth = natWidths.reduce((a, b) => a + b, 0);
+      const available = containerWidth - GAP * (n - 1);
+      if (totalNatWidth <= available) {
+        return { photos: rowPhotos, height: TARGET_ROW_H, widths: natWidths };
+      }
+      const scale = available / totalNatWidth;
+      return {
+        photos: rowPhotos,
+        height: Math.round(TARGET_ROW_H * scale),
+        widths: natWidths.map((w) => Math.round(w * scale)),
+      };
     }
 
     const totalNatWidth = natWidths.reduce((a, b) => a + b, 0);
@@ -73,6 +83,10 @@ export function ThumbnailGrid({ photos }: Props) {
     estimateSize: (i) => (layouts[i]?.height ?? TARGET_ROW_H) + GAP,
     overscan: 4,
   });
+
+  useEffect(() => {
+    rowVirtualizer.measure();
+  }, [containerWidth]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
