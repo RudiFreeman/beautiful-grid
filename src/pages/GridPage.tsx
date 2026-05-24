@@ -201,16 +201,25 @@ interface VirtualGridProps {
   activeId: string | null;
 }
 
+function cellHeight(photo: Photo, cellPx: number): number {
+  const ratio = photo.width > 0 && photo.height > 0 ? photo.height / photo.width : 4 / 3;
+  return Math.round(cellPx * ratio);
+}
+
 function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProps) {
   const parentRef = useRef<HTMLDivElement>(null);
   const rowCount = Math.ceil(photos.length / columns);
-  const rowH = cellPx * 0.75 + gap; // 4:3 cells
+
+  const rowHeights = Array.from({ length: rowCount }, (_, r) => {
+    const rowPhotos = photos.slice(r * columns, (r + 1) * columns);
+    return Math.max(...rowPhotos.map((p) => cellHeight(p, cellPx))) + gap;
+  });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => rowH,
+    estimateSize: (i) => rowHeights[i] ?? Math.round(cellPx * (4 / 3)) + gap,
     overscan: 3,
   });
 
@@ -225,6 +234,9 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
           const start = vRow.index * columns;
           const rowPhotos = photos.slice(start, start + columns);
 
+          const rowH =
+            (rowHeights[vRow.index] ?? Math.round(cellPx * (4 / 3)) + gap) - gap;
+
           return (
             <div
               key={vRow.key}
@@ -236,6 +248,7 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
                   key={photo.id}
                   photo={photo}
                   cellPx={cellPx}
+                  cellH={rowH}
                   isActive={photo.id === activeId}
                 />
               ))}
@@ -252,10 +265,12 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
 function SortableCell({
   photo,
   cellPx,
+  cellH,
   isActive,
 }: {
   photo: Photo;
   cellPx: number;
+  cellH: number;
   isActive: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -270,7 +285,7 @@ function SortableCell({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <GridCell photo={photo} cellPx={cellPx} />
+      <GridCell photo={photo} cellPx={cellPx} cellH={cellH} />
     </div>
   );
 }
@@ -278,14 +293,16 @@ function SortableCell({
 function GridCell({
   photo,
   cellPx,
+  cellH: cellHProp,
   isDragging,
 }: {
   photo: Photo;
   cellPx: number;
+  cellH?: number;
   isDragging?: boolean;
 }) {
   const src = convertFileSrc(photo.thumbPath ?? photo.path);
-  const cellH = Math.round(cellPx * 0.75); // 4:3
+  const cellH = cellHProp ?? cellHeight(photo, cellPx);
 
   return (
     <div

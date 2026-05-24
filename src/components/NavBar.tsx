@@ -1,6 +1,6 @@
 /** Верхняя навигация: Library / Grid / Export, управление проектом, кнопка Support. */
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { newProject, openProject, saveProject } from "../lib/tauri-commands";
@@ -15,26 +15,17 @@ const NAV_ITEMS = [
 
 export function NavBar() {
   const [showSupport, setShowSupport] = useState(false);
-  const [saveLabel, setSaveLabel] = useState("Save");
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
   const store = useAppStore();
+  const isDirty = useAppStore((s) => s.isDirty);
+  const saveLabel = isDirty ? "Save" : "Saved ✓";
 
-  const handleNew = async () => {
-    if (!confirm("Start a new project? Unsaved changes will be lost.")) return;
-    const project = await newProject("New Project").catch(console.error);
-    if (project) {
-      store.reset();
-      store.setProjectName(project.projectName);
-    }
-  };
-
-  const handleSave = async () => {
+  const doSave = async (): Promise<boolean> => {
     const path = await saveDialog({
       filters: [{ name: "Beautiful Grid Project", extensions: ["bgrid"] }],
       defaultPath: `${store.projectName}.bgrid`,
     });
-    if (!path) return;
-
+    if (!path) return false;
     try {
       await saveProject(
         {
@@ -47,12 +38,29 @@ export function NavBar() {
         },
         path,
       );
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      setSaveLabel("Saved ✓");
-      saveTimerRef.current = setTimeout(() => setSaveLabel("Save"), 2000);
+      store.markSaved();
+      return true;
     } catch (e) {
       console.error("Save failed:", e);
-      setSaveLabel("Save");
+      return false;
+    }
+  };
+
+  const doNewProject = async () => {
+    const project = await newProject("New Project").catch(console.error);
+    if (project) {
+      store.reset();
+      store.setProjectName(project.projectName);
+    }
+  };
+
+  const hasPhotos = useAppStore((s) => s.photos.length > 0);
+
+  const handleNew = () => {
+    if (hasPhotos) {
+      setShowNewModal(true);
+    } else {
+      doNewProject();
     }
   };
 
@@ -71,6 +79,7 @@ export function NavBar() {
     store.setColumns(project.settings.columns);
     store.setPhotos(project.photos);
     store.setGridOrder(project.gridOrder);
+    store.markSaved();
   };
 
   return (
@@ -101,7 +110,6 @@ export function NavBar() {
 
         <div className="flex-1" />
 
-        {/* Управление проектом */}
         {[
           { label: "New", action: handleNew },
           { label: "Open", action: handleOpen },
@@ -115,13 +123,12 @@ export function NavBar() {
           </button>
         ))}
         <button
-          onClick={handleSave}
+          onClick={doSave}
           className="rounded px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-800 hover:text-neutral-300"
         >
           {saveLabel}
         </button>
 
-        {/* Кнопка Support */}
         <button
           onClick={() => setShowSupport(true)}
           className="ml-1 rounded border border-neutral-700 px-3 py-1 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-200"
@@ -131,6 +138,71 @@ export function NavBar() {
       </header>
 
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
+
+      {showNewModal && (
+        <NewProjectModal
+          isDirty={isDirty}
+          onSave={async () => {
+            setShowNewModal(false);
+            const saved = await doSave();
+            if (saved) doNewProject();
+          }}
+          onDiscard={() => {
+            setShowNewModal(false);
+            doNewProject();
+          }}
+          onCancel={() => setShowNewModal(false)}
+        />
+      )}
     </>
+  );
+}
+
+function NewProjectModal({
+  isDirty,
+  onSave,
+  onDiscard,
+  onCancel,
+}: {
+  isDirty: boolean;
+  onSave: () => void;
+  onDiscard: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-xs rounded-2xl border border-neutral-700 bg-neutral-900 p-5 shadow-2xl">
+        <h2 className="mb-1 text-sm font-semibold text-neutral-100">New project</h2>
+        <p className="mb-4 text-xs text-neutral-400">
+          {isDirty
+            ? "You have unsaved changes. Save before creating a new project?"
+            : "Create a new project? The current project will be closed."}
+        </p>
+
+        {isDirty && (
+          <button
+            onClick={onSave}
+            className="mb-3 w-full rounded-lg bg-neutral-700 py-2 text-sm font-medium text-neutral-100 transition-colors hover:bg-blue-600 hover:text-white"
+          >
+            Save project
+          </button>
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={onDiscard}
+            className="flex-1 rounded-lg border border-neutral-700 py-1.5 text-xs text-neutral-400 transition-colors hover:border-red-800 hover:text-red-400"
+          >
+            {isDirty ? "Discard" : "Create new"}
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex-1 rounded-lg border border-neutral-700 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-200"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

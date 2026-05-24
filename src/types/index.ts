@@ -14,6 +14,10 @@ export interface Photo {
   dominantColor: [number, number, number] | null;
   /** Дата из EXIF или null. */
   exifDate: string | null;
+  /** Ширина оригинала в пикселях. */
+  width: number;
+  /** Высота оригинала в пикселях. */
+  height: number;
 }
 
 /** Настройки проекта. */

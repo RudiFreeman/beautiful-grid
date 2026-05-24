@@ -10,6 +10,7 @@ interface AppState {
   settings: ProjectSettings;
   isProcessing: boolean;
   processingProgress: [number, number];
+  isDirty: boolean;
 
   setProjectName: (name: string) => void;
   setPhotos: (photos: Photo[]) => void;
@@ -18,6 +19,7 @@ interface AppState {
   setGridOrder: (order: PhotoId[]) => void;
   setColumns: (columns: number) => void;
   setProcessing: (active: boolean, current?: number, total?: number) => void;
+  markSaved: () => void;
   reset: () => void;
 }
 
@@ -28,6 +30,7 @@ const INITIAL_STATE = {
   settings: { columns: 4, theme: "dark" } as ProjectSettings,
   isProcessing: false,
   processingProgress: [0, 0] as [number, number],
+  isDirty: false,
 };
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -44,6 +47,7 @@ export const useAppStore = create<AppState>()((set) => ({
       return {
         photos: [...s.photos, ...fresh],
         gridOrder: [...s.gridOrder, ...fresh.map((p) => p.id)],
+        isDirty: fresh.length > 0,
       };
     }),
 
@@ -52,14 +56,18 @@ export const useAppStore = create<AppState>()((set) => ({
       photos: s.photos.map((p) =>
         colors[p.id] ? { ...p, dominantColor: colors[p.id] } : p,
       ),
+      isDirty: true,
     })),
 
-  setGridOrder: (order) => set({ gridOrder: order }),
+  setGridOrder: (order) => set({ gridOrder: order, isDirty: true }),
 
-  setColumns: (columns) => set((s) => ({ settings: { ...s.settings, columns } })),
+  setColumns: (columns) =>
+    set((s) => ({ settings: { ...s.settings, columns }, isDirty: true })),
 
   setProcessing: (active, current = 0, total = 0) =>
     set({ isProcessing: active, processingProgress: [current, total] }),
+
+  markSaved: () => set({ isDirty: false }),
 
   reset: () => set(INITIAL_STATE),
 }));

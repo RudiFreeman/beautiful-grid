@@ -6,6 +6,7 @@ pub type PhotoId = String;
 
 /// Запись о фото в проекте.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Photo {
     pub id: PhotoId,
     /// Абсолютный путь к оригиналу (только чтение, никогда не модифицируется).
@@ -16,10 +17,15 @@ pub struct Photo {
     pub dominant_color: Option<[u8; 3]>,
     /// Дата из EXIF, None если недоступна.
     pub exif_date: Option<String>,
+    /// Ширина оригинала в пикселях.
+    pub width: u32,
+    /// Высота оригинала в пикселях.
+    pub height: u32,
 }
 
 /// Настройки проекта.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProjectSettings {
     /// Количество фото в ряду сетки.
     pub columns: u32,
@@ -37,6 +43,7 @@ impl Default for ProjectSettings {
 
 /// Полная модель проекта, сериализуемая в .bgrid (JSON).
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Project {
     pub project_name: String,
     /// Версия схемы .bgrid. Всегда 1 для v1.0.
