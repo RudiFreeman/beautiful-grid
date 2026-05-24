@@ -1,0 +1,2 @@
+# Clippy — предупреждения в CI трактуются как ошибки (см. workflow)
+avoid-breaking-exported-api = false

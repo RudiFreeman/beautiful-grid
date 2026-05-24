@@ -31,7 +31,7 @@ Sprint 0 → Sprint 1  ━━━━━ v1.0 MVP cut-off ━━━━━  Sprint 
 
 ---
 
-## Sprint 0 — Setup проекта `[v1.0 MVP]` · `Planned`
+## Sprint 0 — Setup проекта `[v1.0 MVP]` · `In progress`
 
 **Цель.** Подготовить фундамент проекта: рабочий каркас Tauri+React, CI, лицензия, README, иконка. После этого спринта можно писать продуктовые фичи.
 
@@ -45,24 +45,24 @@ Sprint 0 → Sprint 1  ━━━━━ v1.0 MVP cut-off ━━━━━  Sprint 
 **Задачи.**
 
 *Frontend:*
-- [ ] Инициализировать React 18 + TypeScript + Vite.
-- [ ] Подключить Tailwind CSS, базовая тёмная тема.
-- [ ] Подключить Zustand, пустой store.
-- [ ] Каркас навигации: Library / Grid / Export — пустые экраны.
+- [x] Инициализировать React 18 + TypeScript + Vite.
+- [x] Подключить Tailwind CSS, базовая тёмная тема.
+- [x] Подключить Zustand, пустой store.
+- [x] Каркас навигации: Library / Grid / Export — пустые экраны.
 
 *Rust backend (Tauri):*
-- [ ] Инициализировать `src-tauri/`, проверить сборку под arm64 и x64.
-- [ ] Скелет команд (`commands/mod.rs`) — пустые stubs `import_photos`, `analyze_colors`, `export_grid`.
-- [ ] `tauri.conf.json`: заголовок окна, размер, иконки.
+- [x] Инициализировать `src-tauri/`, проверить сборку под arm64 и x64.
+- [x] Скелет команд (`commands/mod.rs`) — пустые stubs `import_photos`, `analyze_colors`, `export_grid`.
+- [x] `tauri.conf.json`: заголовок окна, размер, иконки.
 
 *Infra + CI:*
-- [ ] GitHub Actions: сборка под macOS (arm64) и Windows на каждый PR.
-- [ ] Линтеры: ESLint + Prettier (frontend), rustfmt + clippy (backend).
-- [ ] Файл `LICENSE` (MIT).
+- [x] GitHub Actions: сборка под macOS (arm64) и Windows на каждый PR.
+- [x] Линтеры: ESLint + Prettier (frontend), rustfmt + clippy (backend).
+- [x] Файл `LICENSE` (MIT).
 
 *Docs:*
-- [ ] README: что это, скриншот, как запустить.
-- [ ] CONTRIBUTING.md: code style, ветки, PR-процесс.
+- [x] README: что это, скриншот, как запустить.
+- [x] CONTRIBUTING.md: code style, ветки, PR-процесс.
 
 ---
 
