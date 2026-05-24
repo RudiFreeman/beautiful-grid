@@ -1,2 +1,6 @@
 //! Модуль сериализации/десериализации проекта (.bgrid — JSON).
-//! Реализация — Sprint 1.
+
+pub mod io;
+pub mod model;
+
+pub use model::Project;
