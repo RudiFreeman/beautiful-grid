@@ -14,12 +14,14 @@ export function ExportPage() {
 
   const [format, setFormat] = useState<"jpg" | "png">("jpg");
   const [quality, setQuality] = useState(90);
+  const [outputPath, setOutputPath] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState<[number, number]>([0, 0]);
   const [done, setDone] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
-  const handleExport = async () => {
-    const outputPath = await saveDialog({
+  const handleChoosePath = async () => {
+    const path = await saveDialog({
       filters: [
         {
           name: format === "jpg" ? "JPEG Image" : "PNG Image",
@@ -28,11 +30,19 @@ export function ExportPage() {
       ],
       defaultPath: `beautiful-grid.${format}`,
     });
+    if (path) {
+      setOutputPath(path);
+      setDone(false);
+      setExportError(null);
+    }
+  };
 
+  const handleExport = async () => {
     if (!outputPath) return;
 
     setIsExporting(true);
     setDone(false);
+    setExportError(null);
     setProgress([0, gridOrder.length]);
 
     const unlisten = await listen<{ current: number; total: number }>(
@@ -42,17 +52,10 @@ export function ExportPage() {
 
     try {
       const photoRefs = photos.map((p) => ({ id: p.id, path: p.path }));
-      await exportGrid({
-        photos: photoRefs,
-        gridOrder,
-        columns,
-        outputPath,
-        format,
-        quality,
-      });
+      await exportGrid({ photos: photoRefs, gridOrder, columns, outputPath, format, quality });
       setDone(true);
     } catch (err) {
-      console.error("Export failed:", err);
+      setExportError(String(err));
     } finally {
       unlisten();
       setIsExporting(false);
@@ -79,7 +82,10 @@ export function ExportPage() {
             {(["jpg", "png"] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setFormat(f)}
+                onClick={() => {
+                  setFormat(f);
+                  setOutputPath(null);
+                }}
                 className={[
                   "rounded border px-4 py-1.5 text-sm transition-colors",
                   format === f
@@ -106,9 +112,7 @@ export function ExportPage() {
               onChange={(e) => setQuality(Number(e.target.value))}
               className="w-40 accent-neutral-300"
             />
-            <span className="w-8 text-right font-mono text-sm text-neutral-300">
-              {quality}
-            </span>
+            <span className="w-8 text-right font-mono text-sm text-neutral-300">{quality}</span>
           </div>
         )}
 
@@ -118,14 +122,31 @@ export function ExportPage() {
         </p>
       </div>
 
+      {/* Выбор пути сохранения */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleChoosePath}
+            disabled={isExporting}
+            className="rounded border border-neutral-700 px-4 py-1.5 text-sm text-neutral-300 transition-colors hover:border-neutral-500 hover:text-neutral-100 disabled:opacity-40"
+          >
+            Save as…
+          </button>
+          <span className="truncate text-sm text-neutral-500" title={outputPath ?? ""}>
+            {outputPath ?? "No file selected"}
+          </span>
+        </div>
+      </div>
+
       {isExporting && (
         <ProgressBar current={progress[0]} total={progress[1]} label="Exporting…" />
       )}
       {done && !isExporting && <p className="text-sm text-green-400">Export complete!</p>}
+      {exportError && <p className="text-sm text-red-400">Error: {exportError}</p>}
 
       <button
         onClick={handleExport}
-        disabled={isExporting}
+        disabled={isExporting || !outputPath}
         className="mt-auto w-full rounded-xl bg-neutral-200 py-3 text-sm font-semibold text-neutral-900 transition-colors hover:bg-white disabled:opacity-40"
       >
         {isExporting ? "Exporting…" : "Export"}

@@ -54,8 +54,10 @@ export function NavBar() {
     }
   };
 
+  const hasPhotos = useAppStore((s) => s.photos.length > 0);
+
   const handleNew = () => {
-    if (isDirty) {
+    if (hasPhotos) {
       setShowNewModal(true);
     } else {
       doNewProject();
@@ -139,6 +141,7 @@ export function NavBar() {
 
       {showNewModal && (
         <NewProjectModal
+          isDirty={isDirty}
           onSave={async () => {
             setShowNewModal(false);
             const saved = await doSave();
@@ -156,10 +159,12 @@ export function NavBar() {
 }
 
 function NewProjectModal({
+  isDirty,
   onSave,
   onDiscard,
   onCancel,
 }: {
+  isDirty: boolean;
   onSave: () => void;
   onDiscard: () => void;
   onCancel: () => void;
@@ -169,22 +174,26 @@ function NewProjectModal({
       <div className="w-full max-w-xs rounded-2xl border border-neutral-700 bg-neutral-900 p-5 shadow-2xl">
         <h2 className="mb-1 text-sm font-semibold text-neutral-100">New project</h2>
         <p className="mb-4 text-xs text-neutral-400">
-          You have unsaved changes. Save before creating a new project?
+          {isDirty
+            ? "You have unsaved changes. Save before creating a new project?"
+            : "Create a new project? The current project will be closed."}
         </p>
 
-        <button
-          onClick={onSave}
-          className="mb-3 w-full rounded-lg bg-neutral-700 py-2 text-sm font-medium text-neutral-100 transition-colors hover:bg-blue-600 hover:text-white"
-        >
-          Save project
-        </button>
+        {isDirty && (
+          <button
+            onClick={onSave}
+            className="mb-3 w-full rounded-lg bg-neutral-700 py-2 text-sm font-medium text-neutral-100 transition-colors hover:bg-blue-600 hover:text-white"
+          >
+            Save project
+          </button>
+        )}
 
         <div className="flex gap-2">
           <button
             onClick={onDiscard}
             className="flex-1 rounded-lg border border-neutral-700 py-1.5 text-xs text-neutral-400 transition-colors hover:border-red-800 hover:text-red-400"
           >
-            Discard
+            {isDirty ? "Discard" : "Create new"}
           </button>
           <button
             onClick={onCancel}
