@@ -2,7 +2,12 @@
 
 > Beautiful, local, open-source photo grid composer for photographers and designers.
 
-**Status:** v1.0 MVP — available for macOS and Windows.
+---
+
+## 🚀 Current version
+
+**v1.1.0** — Sprint 1.1: bug fixes and UX polish across the full app.
+Full changelog — [CHANGELOG.md](CHANGELOG.md). Roadmap — [docs/Roadmap.md](docs/Roadmap.md).
 
 ---
 
@@ -13,9 +18,24 @@ Beautiful Grid helps photographers and designers compose large photo collections
 - **Local-only.** Your photos never leave your computer — important for NDA-bound commercial and wedding work.
 - **Auto-sort by dominant color.** One click turns chaos into an HSL gradient.
 - **Manual drag & drop.** Re-arrange the grid pixel-perfect.
-- **Export options.** Save the entire grid as a single high-resolution PNG/JPG. Renamed-copies export (`wedding_001_2026-05-24.jpg`) coming in v1.1.
+- **Export options.** Save the entire grid as a single high-resolution PNG/JPG.
 
 Target platforms: **macOS (Apple Silicon)** and **Windows 10/11**.
+
+---
+
+## 📦 Tech stack
+
+| Layer | Technology |
+|---|---|
+| Desktop shell | Tauri 2 (Rust + WebView) |
+| Frontend | React 18 + TypeScript + Vite |
+| Styling | Tailwind CSS |
+| State management | Zustand |
+| Drag & drop | dnd-kit |
+| Virtualisation | @tanstack/react-virtual |
+| Image processing | `image` · `rayon` (Rust) |
+| Platforms | macOS arm64 · Windows x64 |
 
 ---
 
@@ -25,7 +45,7 @@ No technical knowledge required. Download, install, open — done.
 
 ### macOS (Apple Silicon)
 
-1. Go to [Releases](../../releases) and download `Beautiful.Grid_1.0.0_aarch64.dmg`
+1. Go to [Releases](../../releases) and download `Beautiful.Grid_1.1.0_aarch64.dmg`
 2. Open the downloaded `.dmg` file
 3. Drag **Beautiful Grid** into the **Applications** folder
 4. Open **Applications**, find Beautiful Grid, and **right-click → Open**
@@ -33,20 +53,17 @@ No technical knowledge required. Download, install, open — done.
 
 ### Windows 10 / 11
 
-1. Go to [Releases](../../releases) and download `Beautiful.Grid_1.0.0_x64-setup.exe`
+1. Go to [Releases](../../releases) and download `Beautiful.Grid_1.1.0_x64-setup.exe`
 2. Run the installer and follow the prompts
 3. Launch Beautiful Grid from the Start menu or desktop shortcut
 
 ---
 
-## Tech stack
-
-Tauri (Rust + WebView) · React 18 + TypeScript + Vite · Tailwind CSS · Zustand · dnd-kit · `image` / `kmeans_colors` / `rayon` on the Rust side.
-
 ## Roadmap
 
-- **v1.0 (current):** MVP — import, grid, color sort, export, project save.
-- **v1.1:** Groups + renamed export, row variations.
+- **v1.0:** MVP — import, grid, color sort, export, project save.
+- **v1.1 (current):** Bug fixes and UX polish.
+- **v1.2:** Groups + renamed export, row variations.
 - **Later:** Tags & collections, Instagram preview.
 
 Full plan (Russian): [`docs/Roadmap.md`](docs/Roadmap.md).
