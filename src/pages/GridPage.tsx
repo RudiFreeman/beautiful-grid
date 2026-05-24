@@ -235,6 +235,8 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
           const start = vRow.index * columns;
           const rowPhotos = photos.slice(start, start + columns);
 
+          const rowH = (rowHeights[vRow.index] ?? Math.round(cellPx * (4 / 3)) + gap) - gap;
+
           return (
             <div
               key={vRow.key}
@@ -246,6 +248,7 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
                   key={photo.id}
                   photo={photo}
                   cellPx={cellPx}
+                  cellH={rowH}
                   isActive={photo.id === activeId}
                 />
               ))}
@@ -262,10 +265,12 @@ function VirtualGrid({ photos, columns, cellPx, gap, activeId }: VirtualGridProp
 function SortableCell({
   photo,
   cellPx,
+  cellH,
   isActive,
 }: {
   photo: Photo;
   cellPx: number;
+  cellH: number;
   isActive: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -280,7 +285,7 @@ function SortableCell({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <GridCell photo={photo} cellPx={cellPx} />
+      <GridCell photo={photo} cellPx={cellPx} cellH={cellH} />
     </div>
   );
 }
@@ -288,14 +293,16 @@ function SortableCell({
 function GridCell({
   photo,
   cellPx,
+  cellH: cellHProp,
   isDragging,
 }: {
   photo: Photo;
   cellPx: number;
+  cellH?: number;
   isDragging?: boolean;
 }) {
   const src = convertFileSrc(photo.thumbPath ?? photo.path);
-  const cellH = cellHeight(photo, cellPx);
+  const cellH = cellHProp ?? cellHeight(photo, cellPx);
 
   return (
     <div

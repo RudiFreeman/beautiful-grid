@@ -30,37 +30,41 @@ export function LibraryPage() {
     let aborted = false;
     let unlisten: (() => void) | undefined;
 
+    let unlistenDrop: (() => void) | undefined;
+    let unlistenEnter: (() => void) | undefined;
+    let unlistenLeave: (() => void) | undefined;
+
     listen<{ paths: string[] }>("tauri://drag-drop", (event) => {
       setIsDragOver(false);
       dragCounterRef.current = 0;
       runImportRef.current(event.payload.paths);
     }).then((fn) => {
       if (aborted) fn();
-      else unlisten = fn;
+      else unlistenDrop = fn;
     });
 
-    const onDragEnter = () => {
-      dragCounterRef.current++;
+    listen("tauri://drag-enter", () => {
       setIsDragOver(true);
-    };
-    const onDragLeave = () => {
-      dragCounterRef.current--;
-      if (dragCounterRef.current <= 0) {
-        dragCounterRef.current = 0;
-        setIsDragOver(false);
-      }
-    };
-    const onDragOver = (e: DragEvent) => e.preventDefault();
+    }).then((fn) => {
+      if (aborted) fn();
+      else unlistenEnter = fn;
+    });
 
-    window.addEventListener("dragenter", onDragEnter);
-    window.addEventListener("dragleave", onDragLeave);
+    listen("tauri://drag-leave", () => {
+      setIsDragOver(false);
+    }).then((fn) => {
+      if (aborted) fn();
+      else unlistenLeave = fn;
+    });
+
+    const onDragOver = (e: DragEvent) => e.preventDefault();
     window.addEventListener("dragover", onDragOver);
 
     return () => {
       aborted = true;
-      unlisten?.();
-      window.removeEventListener("dragenter", onDragEnter);
-      window.removeEventListener("dragleave", onDragLeave);
+      unlistenDrop?.();
+      unlistenEnter?.();
+      unlistenLeave?.();
       window.removeEventListener("dragover", onDragOver);
     };
   }, []);
